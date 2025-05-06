@@ -1,39 +1,57 @@
-// Тип аргумент T
-function processingData<T>(data: T): T {
-    // ...
+// Тип аргумента T, S - где T - принимает массив
+function processingData<T, S>(data: T[], options: S): string {
+    data.length;
+    // Приём сужение типов с помощью switch casов в generic функции
+    switch (typeof data) {
+        case "string":
+            return `${data}, speed: ${options}`;
+            break;
+        case "number":
+            return `${data}, speed: ${options}`;
+            break;
+        default:
+            return "Not valid";
+    }
+}
 
+let res1 = processingData([1], "fast"); // ВЫВОД: number и string (новый индентефикатор "fast", передаём массив числа)
+let res2 = processingData(["1"], "slow"); // ВЫВОД: "string"(передаём массив числа)
+const res3 = processingData<number, string>([10], "slow"); // Тип аргумента number и string (передаём массив числа)
+
+// Функция шаблон
+// Аннотация функции с помощью generic типов
+function processing<T>(data: T): T {
     return data;
 }
 
-let res1 = processingData(1); // ВЫВОД: number
-let res2 = processingData("1"); // ВЫВОД: "string"
-
-const num = 10;
-
-const res3 = processingData<number>(num); // Тип аргумента number
-
-// Интерфейсы
-interface PrintUK {
-    design: number;
+// Интерфейс типа generic
+interface ProcessingFunc {
+    <T>(data: T): T;
 }
 
-interface PrintES {
-    design: string;
+let newFunc: ProcessingFunc = processing;
+
+interface DataSaver {
+    // processing: typeof processing; // Запрос типа из функции шаблона
+    // Второй вариант с помощью интерфейс типа generic
+    processing: ProcessingFunc;
 }
 
-// Создаем обобщенный интерфейсы "GENERIC"
-interface Print<Type> {
-    design: Type;
-}
+// Метод saver
+const saver: DataSaver = {
+    // Первый вариант
+    // processing(data) {
+    //     console.log(data);
+    //     return data;
+    // },
 
-// Ссылка на интерфейс Print с типом аргумента string
-const somePrint: Print<string> = {
-    design: "ten",
-};
+    // Второй вариант
+    // processing: <T>(data: T) => {
+    //     return data;
+    // },
 
-// Ссылка на интерфейс Print с типом аргумента number
-const someOtherPrint: Print<number> = {
-    design: 10,
+    // Третий вариант с шаблоном
+    processing: processing,
 };
 
 // Array<T>;
