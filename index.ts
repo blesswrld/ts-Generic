@@ -1,35 +1,40 @@
-// Generic class
-// Передаём T, S - как индентефикаторы
-class User<T, S> {
-    name: T;
-    age: S;
+// built-in generics
 
-    constructor(name: T, age: S) {
-        this.name = name;
-        this.age = age;
-    }
+// Аннотация Array
+const arr1: Array<number> = [1, 2, 3];
+// Аннотация number
+const arr2: number[] = [1, 2, 3];
 
-    // Generic метод
-    sayMyFullName<T>(surname: T): string {
-        if (typeof surname !== "string") {
-            return `I have only name: ${this.name}`;
-        } else {
-            return `${this.name} ${surname}`;
-        }
-    }
+// Аннотация ReadonlyArray (массив только для чтения) и string
+const roarr: ReadonlyArray<string> = ["abcdef"];
+// roarr[0] = "abcd"; // error
+
+// Интерфейс
+interface IState {
+    // свойство data будет только для чтения (readonly - не изменяемое)
+    readonly data: {
+        name: string;
+    };
+    tag?: string; // делаем свойство необязательным
 }
 
-// Generic class с фиксированными типами данных string и number
-class AdminUser<T> extends User<string, number> {
-    // rules: T;
-    // constructor(parameters) {}
+// Доп обёретка над IState
+const state: Partial<IState> = {
+    data: {
+        name: "Alex",
+    },
+};
+
+// Аннотация Required (делает свойство обязательным)
+const strictState: Required<IState> = {
+    data: {
+        name: "Tom",
+    },
+    tag: "qwerty", // сейчас required
+};
+
+// strictState.data = "smth here"; // readonly (нельзя изменить значение)
+
+function action(state: Readonly<IState>) {
+    state.data.name = "abcd";
 }
-
-const tamerlan = new User("Tamerlan", 30); // string - number
-console.log(tamerlan.sayMyFullName("Smith")); // Вывод в консоль
-
-const nameData = "John"; // string
-const ageData = 54; // number
-
-// Фиксируем типы данных string и number
-const john = new User<string, number>(nameData, ageData);
