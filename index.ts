@@ -1,79 +1,127 @@
-// Generic Интерфейс
-interface ProcessingFunc {
-    <T>(daTa: T): T;
+// Создать Generic-интерфейс PlayerData, который подходил бы для создания таких объектов:
+
+interface PlayerData<Game, Hours> {
+    game: Game;
+    hours: Hours;
+    server: string;
 }
 
-// Функция шаблон
-// Аннотация функции с помощью generic типов
-function processing<T>(data: T): T {
-    return data;
-}
-
-let newFunc: ProcessingFunc = processing;
-
-// Generic Type
-type Smth<T> = T;
-
-const num: Smth<number> = 5; // Фиксируем значение для generic type
-
-interface ParentsOfUser {
-    mother: string;
-    father: string;
-}
-
-// Generic Type
-// Первый вариант
-// type User<T> = {
-//     login: T;
-//     age: number;
-// };
-
-// Второй вариант с интерфейсом (более практичен)
-// Наследуем generic-type из интерфейса ParentsOfUser
-interface User<ParentsData extends ParentsOfUser> {
-    login: string;
-    age: number;
-    parents: ParentsData; // Данные о родителях
-}
-
-// Фиксируем значение "str" для свойства login
-const user1: User<{ mother: string; father: string; married: boolean }> = {
-    login: "str",
-    age: 54,
-    parents: { mother: "Anna", father: "no data", married: true }, // Передаём строго эти данные
+const player1: PlayerData<string, number> = {
+    game: "CS:GO",
+    hours: 300,
+    server: "basic",
 };
 
-// Generic helper-types
-// Либо Type либо null (ничего)
-type OrNull<Type> = Type | null; // | - Оператор Union-Типа
-type OneOrMany<Type> = Type | Type[];
+const player2: PlayerData<number, string> = {
+    game: 2048,
+    hours: "300 h.",
+    server: "arcade",
+};
 
-// Передаём массив чисел
-const data: OneOrMany<number[]> = [5];
+const player3: PlayerData<string, object> = {
+    game: "Chess",
+    hours: {
+        total: 500,
+        inMenu: 50,
+    },
+    server: "chess",
+};
 
-// Generic функция для сужение типов
-// Наследуем number - string входящих данных используя Union-тип ( | )
-// const depositMoney = <T extends number | string>(amount: T): T => {
-//     console.log(`req to server with amount: ${amount}`);
-//     return amount;
-// };
+// Массив данных с фигурами содержит объекты, у каждого из которых обязательно есть свойство name
+// Каждый объект может еще содержать дополнительные свойства в случайном виде
+// Свойство name может иметь только 4 варианта
+// Функция calculateAmountOfFigures должна принимать массив с объектами, у которых обязательно должно быть свойство name
+// Возвращает она объект-экземпляр AmountOfFigures
+// Внутри себя подсчитывает сколько каких фигур было в массиве и записывает результаты в AmountOfFigures
+// С текущими данными в консоль должно попадать:
+// { squares: 3, circles: 2, triangles: 2, others: 1 }
 
-// depositMoney(500); // number
-// depositMoney("500"); // string
-// depositMoney(false); // error тк мы не передавали тип данных на приём
+enum FigureNames {
+    Rect = "rect",
+    Circle = "circle",
+    Triangle = "triangle",
+    Line = "line",
+}
 
-// Функция с аннотацией для сужение типов
-const depositMoney = (amount: number | string): number | string => {
-    console.log(`req to server with amount: ${amount}`);
+interface Figure {
+    name: FigureNames;
+}
+
+interface AmountOfFigures {
+    squares: number;
+    circles: number;
+    triangles: number;
+    others: number;
+}
+
+interface CustomFigure extends Figure {
+    data?: {};
+}
+
+function calculateAmountOfFigures<T extends Figure>(
+    figure: T[]
+): AmountOfFigures {
+    const amount: AmountOfFigures = {
+        squares: 0,
+        circles: 0,
+        triangles: 0,
+        others: 0,
+    };
+
+    figure.forEach((fig) => {
+        switch (fig.name) {
+            case FigureNames.Rect:
+                amount.squares++;
+                break;
+            case FigureNames.Circle:
+                amount.circles++;
+                break;
+            case FigureNames.Triangle:
+                amount.triangles++;
+                break;
+            default:
+                amount.others++;
+                break;
+        }
+    });
+
     return amount;
-};
+}
 
-depositMoney(500); // number
-depositMoney("500"); // string
-depositMoney(false); // error тк мы не передавали тип данных на приём
+const data: CustomFigure[] = [
+    {
+        name: FigureNames.Rect,
+        data: { a: 5, b: 10 },
+    },
+    {
+        name: FigureNames.Rect,
+        data: { a: 6, b: 11 },
+    },
+    {
+        name: FigureNames.Triangle,
+        data: { a: 5, b: 10, c: 14 },
+    },
+    {
+        name: FigureNames.Line,
+        data: { l: 15 },
+    },
+    {
+        name: FigureNames.Circle,
+        data: { r: 10 },
+    },
+    {
+        name: FigureNames.Circle,
+        data: { r: 5 },
+    },
+    {
+        name: FigureNames.Rect,
+        data: { a: 15, b: 7 },
+    },
+    {
+        name: FigureNames.Triangle,
+    },
+];
 
-// Array<T>;
-// RefferalSystem<UserID, UserRefferals>;
+console.log(calculateAmountOfFigures(data));
 
-// Базовый набор букв в generic
-// T U V S P K K/V
+// --- ЗАДАЧА ВЫПОЛНЕНА ---
