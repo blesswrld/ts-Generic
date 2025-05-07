@@ -1,22 +1,7 @@
-// Тип аргумента T, S - где T - принимает массив
-function processingData<T, S>(data: T[], options: S): string {
-    data.length;
-    // Приём сужение типов с помощью switch casов в generic функции
-    switch (typeof data) {
-        case "string":
-            return `${data}, speed: ${options}`;
-            break;
-        case "number":
-            return `${data}, speed: ${options}`;
-            break;
-        default:
-            return "Not valid";
-    }
+// Generic Интерфейс
+interface ProcessingFunc {
+    <T>(daTa: T): T;
 }
-
-let res1 = processingData([1], "fast"); // ВЫВОД: number и string (новый индентефикатор "fast", передаём массив числа)
-let res2 = processingData(["1"], "slow"); // ВЫВОД: "string"(передаём массив числа)
-const res3 = processingData<number, string>([10], "slow"); // Тип аргумента number и string (передаём массив числа)
 
 // Функция шаблон
 // Аннотация функции с помощью generic типов
@@ -24,35 +9,68 @@ function processing<T>(data: T): T {
     return data;
 }
 
-// Интерфейс типа generic
-interface ProcessingFunc {
-    <T>(data: T): T;
-}
-
 let newFunc: ProcessingFunc = processing;
 
-interface DataSaver {
-    // processing: typeof processing; // Запрос типа из функции шаблона
-    // Второй вариант с помощью интерфейс типа generic
-    processing: ProcessingFunc;
+// Generic Type
+type Smth<T> = T;
+
+const num: Smth<number> = 5; // Фиксируем значение для generic type
+
+interface ParentsOfUser {
+    mother: string;
+    father: string;
 }
 
-// Метод saver
-const saver: DataSaver = {
-    // Первый вариант
-    // processing(data) {
-    //     console.log(data);
-    //     return data;
-    // },
+// Generic Type
+// Первый вариант
+// type User<T> = {
+//     login: T;
+//     age: number;
+// };
 
-    // Второй вариант
-    // processing: <T>(data: T) => {
-    //     return data;
-    // },
+// Второй вариант с интерфейсом (более практичен)
+// Наследуем generic-type из интерфейса ParentsOfUser
+interface User<ParentsData extends ParentsOfUser> {
+    login: string;
+    age: number;
+    parents: ParentsData; // Данные о родителях
+}
 
-    // Третий вариант с шаблоном
-    processing: processing,
+// Фиксируем значение "str" для свойства login
+const user1: User<{ mother: string; father: string; married: boolean }> = {
+    login: "str",
+    age: 54,
+    parents: { mother: "Anna", father: "no data", married: true }, // Передаём строго эти данные
 };
+
+// Generic helper-types
+// Либо Type либо null (ничего)
+type OrNull<Type> = Type | null; // | - Оператор Union-Типа
+type OneOrMany<Type> = Type | Type[];
+
+// Передаём массив чисел
+const data: OneOrMany<number[]> = [5];
+
+// Generic функция для сужение типов
+// Наследуем number - string входящих данных используя Union-тип ( | )
+// const depositMoney = <T extends number | string>(amount: T): T => {
+//     console.log(`req to server with amount: ${amount}`);
+//     return amount;
+// };
+
+// depositMoney(500); // number
+// depositMoney("500"); // string
+// depositMoney(false); // error тк мы не передавали тип данных на приём
+
+// Функция с аннотацией для сужение типов
+const depositMoney = (amount: number | string): number | string => {
+    console.log(`req to server with amount: ${amount}`);
+    return amount;
+};
+
+depositMoney(500); // number
+depositMoney("500"); // string
+depositMoney(false); // error тк мы не передавали тип данных на приём
 
 // Array<T>;
 // RefferalSystem<UserID, UserRefferals>;
